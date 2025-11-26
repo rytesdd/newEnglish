@@ -1,0 +1,363 @@
+.result-layout {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+  margin-top: 30px;
+}
+
+.text-display {
+  flex: 2;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+}
+
+.text-display-header {
+  background: #232323;
+  color: #ffffff;
+  padding: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.file-info h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.5rem;
+}
+
+.filename {
+  margin: 5px 0;
+  font-size: 0.95rem;
+  opacity: 0.9;
+}
+
+.text-stats {
+  margin: 5px 0 0 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.text-content {
+  max-height: 600px;
+  overflow-y: auto;
+  padding: 20px;
+  background: #f8f9fa;
+}
+
+.text-content pre {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  font-size: 14px;
+  line-height: 38px; /* 22px 单词高度 + 16px 行间距 */
+  color: #333;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  user-select: none; /* 防止默认文本选择，使用自定义选择 */
+}
+
+/* 单词样式 */
+.text-content pre .word {
+  display: inline-block;
+  padding: 0 4px;
+  margin: 0 1px;
+  border-radius: 3px;
+  transition: all 0.15s ease;
+  cursor: text;
+  user-select: none;
+  height: 22px;
+  line-height: 22px;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+
+/* 普通模式下的单词悬停效果 */
+.text-content pre .word:hover {
+  background-color: #e5e5e5;
+}
+
+/* 空格模式下的单词悬停效果 */
+.text-content.space-mode pre .word {
+  cursor: crosshair;
+}
+
+.text-content.space-mode pre .word:hover {
+  background-color: #d0d0d0;
+}
+
+/* 选中的单词样式 */
+.text-content pre .word-selected {
+  background-color: #232323 !important;
+  color: #fff !important;
+  font-weight: 500;
+  height: 22px !important;
+  line-height: 22px !important;
+}
+
+/* 选中信息样式 */
+.selection-info {
+  color: #ffffff;
+  font-weight: 500;
+}
+
+/* 空格提示 */
+.space-hint {
+  margin: 10px 0 0 0;
+  padding: 8px 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* 滚动条样式 */
+.text-content::-webkit-scrollbar {
+  width: 10px;
+}
+
+.text-content::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.text-content::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 5px;
+}
+
+.text-content::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.candidate-panel {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.candidate-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.candidate-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: #333;
+}
+
+.candidate-header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.candidate-count {
+  font-size: 0.9rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.translated-count {
+  font-size: 0.85rem;
+  color: #999;
+}
+
+.translate-btn {
+  padding: 8px 20px;
+  background-color: #232323;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.translate-btn:hover:not(:disabled) {
+  background-color: #444444;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.translate-btn:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.save-btn {
+  padding: 8px 20px;
+  background-color: #52c41a;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+  background-color: #73d13d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.save-btn:disabled {
+  background-color: #999;
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.candidate-body {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.candidate-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.candidate-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #dddddd;
+  background: #f7f7f7;
+}
+
+.candidate-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.candidate-word-section {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.candidate-text {
+  font-size: 0.95rem;
+  color: #333;
+  line-height: 1.5;
+  font-weight: 500;
+}
+
+.candidate-translation {
+  font-size: 0.9rem;
+  color: #666;
+  line-height: 1.4;
+  padding-left: 8px;
+  border-left: 3px solid #232323;
+  font-style: italic;
+}
+
+.candidate-tag {
+  font-size: 0.8rem;
+  color: #000000;
+  background: #e0e0e0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.candidate-sentence {
+  margin-top: 6px;
+  padding: 8px 10px;
+  background: #ffffff;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.sentence-label {
+  color: #666;
+  font-weight: 500;
+  margin-right: 6px;
+}
+
+.sentence-text {
+  color: #444;
+  font-style: italic;
+}
+
+.candidate-empty {
+  color: #999;
+  font-size: 0.9rem;
+  text-align: center;
+  margin: 0;
+  padding: 20px 10px;
+}
+
+@media (max-width: 1024px) {
+  .result-layout {
+    flex-direction: column;
+  }
+
+  .candidate-panel {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .text-display-header {
+    flex-direction: column;
+  }
+
+  .text-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .action-btn {
+    flex: 1;
+  }
+
+  .text-content {
+    max-height: 400px;
+  }
+
+  .candidate-panel {
+    padding: 18px;
+  }
+}
+

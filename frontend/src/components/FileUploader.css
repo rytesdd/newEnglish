@@ -1,0 +1,41 @@
+.file-uploader {
+  margin-bottom: 24px;
+}
+
+.upload-area {
+  border: 3px dashed #000000;
+  border-radius: 12px;
+  padding: 0 20px;
+  min-height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background: #f8f8f8;
+}
+
+.upload-area:hover {
+  border-color: #000000;
+  background: #eaeaea;
+  transform: translateY(-2px);
+}
+
+.upload-area:active {
+  transform: translateY(0);
+}
+
+.upload-icon {
+  display: none;
+}
+
+.upload-text {
+  font-size: 14px;
+  color: #232323;
+  margin: 0;
+}
+
+.upload-hint {
+  display: none;
+}
+

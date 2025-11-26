@@ -1,0 +1,27 @@
+/* Ant Design Input 自定义样式 - 透明背景和文字颜色 */
+.youtube-input-custom .ant-input,
+.youtube-input-custom.ant-input-affix-wrapper,
+.youtube-input-custom.ant-input-affix-wrapper .ant-input,
+.youtube-input-custom input,
+.youtube-input-custom.ant-input-affix-wrapper input {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: #232323 !important;
+}
+
+.youtube-input-custom.ant-input-affix-wrapper:hover,
+.youtube-input-custom.ant-input-affix-wrapper:focus,
+.youtube-input-custom.ant-input-affix-wrapper-focused,
+.youtube-input-custom.ant-input-affix-wrapper-focused:hover,
+.youtube-input-custom.ant-input-affix-wrapper-disabled {
+  background-color: transparent !important;
+  background: transparent !important;
+}
+
+/* 输入框聚焦和悬停状态也保持透明 */
+.youtube-input-custom.ant-input-affix-wrapper-focused .ant-input,
+.youtube-input-custom.ant-input-affix-wrapper:hover .ant-input {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: #232323 !important;
+}

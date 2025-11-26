@@ -1,0 +1,68 @@
+.word-groups-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.word-groups-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 0 16px;
+}
+
+.word-groups-list {
+  background: #fff;
+  border-radius: 8px;
+  padding: 16px;
+  margin: 0 16px;
+}
+
+.group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.group-name {
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.group-count {
+  color: #999;
+  font-size: 14px;
+}
+
+.word-item {
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.word-item:last-child {
+  border-bottom: none;
+}
+
+.word-details {
+  margin-top: 8px;
+}
+
+.word-translation,
+.word-sentence {
+  margin-top: 4px;
+  line-height: 1.6;
+}
+
+.word-translation .ant-typography,
+.word-sentence .ant-typography {
+  margin-left: 8px;
+}
+
+.loading-spinner {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
