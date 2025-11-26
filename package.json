@@ -4,9 +4,10 @@
   "description": "文件上传和解析工具",
   "main": "backend/server.js",
   "scripts": {
-    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "dev": "concurrently \"npm run server\" \"npm run client\" \"npm run auto-git\"",
     "server": "cd backend && node server.js",
     "client": "cd frontend && npm start",
+    "auto-git": "node auto-git.js",
     "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "keywords": ["file", "parser", "upload"],
