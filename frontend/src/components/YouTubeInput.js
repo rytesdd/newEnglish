@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { Input, Button, Form, message } from 'antd';
+import { Input, Form, message } from 'antd';
 import './YouTubeInput.css';
 
 const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
@@ -48,14 +48,7 @@ const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
     }
   };
 
-  const handleSubmit = async (values) => {
-    const urlValue = values.url || url;
-    if (!urlValue || !urlValue.trim()) {
-      message.warning('请输入 YouTube 视频链接');
-      return;
-    }
-    await fetchTranscript(urlValue);
-  };
+  // 已移除 handleSubmit，现在使用自动解析
 
   const handleInputChange = (e) => {
     const newUrl = e.target.value;
@@ -80,7 +73,6 @@ const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
       <Form
         form={form}
         layout="inline"
-        onFinish={handleSubmit}
         style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}
       >
         <Form.Item
@@ -95,16 +87,6 @@ const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
             allowClear
             className="youtube-input-custom"
           />
-        </Form.Item>
-        <Form.Item style={{ margin: 0 }}>
-          <Button
-            type="primary"
-            size="large"
-            htmlType="submit"
-            disabled={!url.trim()}
-          >
-            获取字幕
-          </Button>
         </Form.Item>
       </Form>
       <p style={{ marginTop: 8, marginBottom: 0, fontSize: '0.9rem', color: '#666', textAlign: 'center' }}>

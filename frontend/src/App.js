@@ -124,7 +124,7 @@ function App() {
             </button>
           </div>
           <Button 
-            type="default" 
+            type="text" 
             onClick={handleLogout}
             style={{ marginLeft: '16px' }}
           >
