@@ -3,60 +3,144 @@ const path = require('path');
 const fs = require('fs-extra');
 
 // 安全加载 dotenv
+console.log('开始加载环境变量...');
 try {
   const dotenvPath = fs.existsSync(path.join(__dirname, '../.env'))
     ? path.join(__dirname, '../.env')
     : path.join(__dirname, '../../.env');
   if (fs.existsSync(dotenvPath)) {
+    console.log('找到 .env 文件:', dotenvPath);
     require('dotenv').config({ path: dotenvPath });
   } else {
+    console.log('未找到 .env 文件，使用环境变量');
     require('dotenv').config(); // 尝试默认路径
   }
+  console.log('✅ 环境变量加载完成');
 } catch (e) {
-  console.warn('加载 .env 文件失败，使用环境变量:', e.message);
+  console.warn('⚠️ 加载 .env 文件失败，使用环境变量:', e.message);
+  console.warn('错误堆栈:', e.stack);
 }
 
 // 安全加载所有依赖
 console.log('开始加载依赖...');
+console.log('当前工作目录:', process.cwd());
+console.log('__dirname:', __dirname);
+console.log('Node 版本:', process.version);
+
 let express, cors, multer, execSync, pdfParse, mammoth, YoutubeTranscript, axios, parseString, DOMParser, ytdl, session, cookieParser;
 
+// 逐个加载依赖，以便精确定位问题
 try {
-  console.log('加载 express...');
+  console.log('[1/12] 加载 express...');
   express = require('express');
-  console.log('加载 cors...');
+  console.log('      ✅ express 加载成功');
+} catch (error) {
+  console.error('      ❌ express 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[2/12] 加载 cors...');
   cors = require('cors');
-  console.log('加载 multer...');
+  console.log('      ✅ cors 加载成功');
+} catch (error) {
+  console.error('      ❌ cors 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[3/12] 加载 multer...');
   multer = require('multer');
-  console.log('加载 child_process...');
+  console.log('      ✅ multer 加载成功');
+} catch (error) {
+  console.error('      ❌ multer 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[4/12] 加载 child_process...');
   execSync = require('child_process').execSync;
-  console.log('加载 pdf-parse...');
+  console.log('      ✅ child_process 加载成功');
+} catch (error) {
+  console.error('      ❌ child_process 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[5/12] 加载 pdf-parse...');
   pdfParse = require('pdf-parse');
-  console.log('加载 mammoth...');
+  console.log('      ✅ pdf-parse 加载成功');
+} catch (error) {
+  console.error('      ❌ pdf-parse 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[6/12] 加载 mammoth...');
   mammoth = require('mammoth');
-  console.log('加载 youtube-transcript...');
+  console.log('      ✅ mammoth 加载成功');
+} catch (error) {
+  console.error('      ❌ mammoth 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[7/12] 加载 youtube-transcript...');
   const youtubeTranscriptModule = require('youtube-transcript');
   YoutubeTranscript = youtubeTranscriptModule.YoutubeTranscript || youtubeTranscriptModule;
-  console.log('加载 axios...');
-  axios = require('axios');
-  console.log('加载 xml2js...');
-  parseString = require('xml2js').parseString;
-  console.log('加载 @xmldom/xmldom...');
-  DOMParser = require('@xmldom/xmldom').DOMParser;
-  console.log('加载 ytdl-core...');
-  ytdl = require('ytdl-core');
-  console.log('加载 express-session...');
-  session = require('express-session');
-  console.log('加载 cookie-parser...');
-  cookieParser = require('cookie-parser');
-  console.log('✅ 所有依赖加载成功！');
+  console.log('      ✅ youtube-transcript 加载成功');
 } catch (error) {
-  console.error('❌ 加载依赖失败:', error.message);
-  console.error('错误堆栈:', error.stack);
-  console.error('当前工作目录:', process.cwd());
-  console.error('__dirname:', __dirname);
-  console.error('Node 版本:', process.version);
-  process.exit(1);
+  console.error('      ❌ youtube-transcript 加载失败:', error.message);
+  throw error;
 }
+
+try {
+  console.log('[8/12] 加载 axios...');
+  axios = require('axios');
+  console.log('      ✅ axios 加载成功');
+} catch (error) {
+  console.error('      ❌ axios 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[9/12] 加载 xml2js...');
+  parseString = require('xml2js').parseString;
+  console.log('      ✅ xml2js 加载成功');
+} catch (error) {
+  console.error('      ❌ xml2js 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[10/12] 加载 @xmldom/xmldom...');
+  DOMParser = require('@xmldom/xmldom').DOMParser;
+  console.log('      ✅ @xmldom/xmldom 加载成功');
+} catch (error) {
+  console.error('      ❌ @xmldom/xmldom 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[11/12] 加载 ytdl-core...');
+  ytdl = require('ytdl-core');
+  console.log('      ✅ ytdl-core 加载成功');
+} catch (error) {
+  console.error('      ❌ ytdl-core 加载失败:', error.message);
+  throw error;
+}
+
+try {
+  console.log('[12/12] 加载 express-session 和 cookie-parser...');
+  session = require('express-session');
+  cookieParser = require('cookie-parser');
+  console.log('      ✅ express-session 和 cookie-parser 加载成功');
+} catch (error) {
+  console.error('      ❌ express-session 或 cookie-parser 加载失败:', error.message);
+  throw error;
+}
+
+console.log('✅ 所有依赖加载成功！');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
