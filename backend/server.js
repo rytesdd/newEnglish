@@ -146,7 +146,8 @@ const PORT = process.env.PORT || 3001;
 
 // 密码配置（从环境变量读取）
 const PASSWORD = process.env.PASSWORD || 'Wzy1996.';
-const SESSION_SECRET = process.env.SESSION_SECRET || 'file-parser-secret-key-2024';
+const JWT_SECRET = process.env.JWT_SECRET || process.env.SESSION_SECRET || 'file-parser-secret-key-2024';
+const JWT_EXPIRES_IN = '24h'; // Token 24 小时过期
 
 // 配置 CORS - 支持生产环境
 const allowedOrigins = process.env.ALLOWED_ORIGINS 
