@@ -174,7 +174,6 @@ app.use(cors({
   exposedHeaders: ['Set-Cookie']
 }));
 app.use(express.json());
-app.use(cookieParser());
 
 // 配置生产环境标识
 const isProduction = process.env.NODE_ENV === 'production';
@@ -197,55 +196,31 @@ if (isProduction) {
   }
 }
 
-// 配置 session - 使用文件存储，避免内存存储问题
-const sessionStore = new (require('express-session').MemoryStore)(); // 暂时还是用内存，但确保配置正确
+// JWT Token 认证，不需要 Session
 
-app.use(session({
-  secret: SESSION_SECRET,
-  store: sessionStore,
-  resave: false, // 改为 false，避免不必要的保存
-  saveUninitialized: false, // 改为 false，只有修改过的 session 才保存
-  rolling: true, // 每次请求都刷新过期时间
-  cookie: {
-    secure: true, // 生产环境必须使用 HTTPS，设为 true
-    httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 小时
-    sameSite: 'none', // 跨域必须使用 'none'
-    path: '/', // 明确设置 path
-    domain: undefined // 不设置 domain，让浏览器自动处理跨域 cookie
-  },
-  name: 'connect.sid' // 明确指定 cookie 名称
-}));
-
-// 登录验证中间件
+// JWT Token 验证中间件
 const requireLogin = (req, res, next) => {
-  // 详细调试日志 - 每次都输出，方便排查
-  const debugInfo = {
-    hasSession: !!req.session,
-    isAuthenticated: req.session?.isAuthenticated,
-    sessionId: req.sessionID,
-    cookieHeader: req.headers.cookie ? '存在' : '不存在',
-    cookieValue: req.headers.cookie,
-    origin: req.headers.origin,
-    url: req.url,
-    sessionKeys: req.session ? Object.keys(req.session) : [],
-    sessionData: req.session ? JSON.stringify(req.session) : 'null'
-  };
+  // 从请求头获取 Token
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer <token>
   
-  console.log('🔐 验证登录状态:', JSON.stringify(debugInfo, null, 2));
-  
-  if (!req.session || !req.session.isAuthenticated) {
-    console.log('❌ 未通过登录验证 - 详细信息:', JSON.stringify(debugInfo, null, 2));
-    return res.status(401).json({ 
-      success: false, 
-      error: '请先登录',
-      debug: process.env.NODE_ENV === 'development' ? debugInfo : undefined
-    });
+  if (!token) {
+    console.log('❌ 未提供 Token');
+    return res.status(401).json({ success: false, error: '请先登录' });
   }
   
-  // 验证通过，继续处理
-  console.log('✅ 登录验证通过 - Session ID:', req.sessionID);
-  next();
+  // 验证 Token
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      console.log('❌ Token 验证失败:', err.message);
+      return res.status(401).json({ success: false, error: 'Token 无效或已过期，请重新登录' });
+    }
+    
+    // Token 验证通过，将用户信息附加到请求对象
+    req.user = decoded;
+    console.log('✅ Token 验证通过，用户:', decoded.username || 'unknown');
+    next();
+  });
 };
 
 // 确保上传目录存在（支持从根目录或 backend 目录运行）
@@ -317,58 +292,30 @@ app.post('/api/login', (req, res) => {
   const { password } = req.body;
   
   console.log('🔑 登录请求:', {
-    hasSession: !!req.session,
-    sessionId: req.sessionID,
-    origin: req.headers.origin,
-    cookie: req.headers.cookie
+    origin: req.headers.origin
   });
   
   if (password === PASSWORD) {
     // 确保响应头包含正确的 CORS 设置
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Credentials', 'false');
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
     
-    // 直接设置认证状态
-    req.session.isAuthenticated = true;
+    // 生成 JWT Token
+    const token = jwt.sign(
+      { 
+        username: 'user',
+        loginTime: new Date().toISOString()
+      },
+      JWT_SECRET,
+      { expiresIn: JWT_EXPIRES_IN }
+    );
     
-    // 立即保存，不使用回调，让 express-session 自动处理
-    // 但我们需要确保保存完成
-    return new Promise((resolve, reject) => {
-      req.session.save((err) => {
-        if (err) {
-          console.error('❌ Session 保存失败:', err);
-          return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
-        }
-        
-        // 验证 Session 是否真的保存了
-        const sessionInfo = {
-          sessionId: req.sessionID,
-          isAuthenticated: req.session.isAuthenticated,
-          cookieHeader: res.getHeader('Set-Cookie'),
-          sessionKeys: Object.keys(req.session),
-          sessionData: JSON.stringify(req.session)
-        };
-        
-        console.log('✅ 登录成功，Session 已保存:', JSON.stringify(sessionInfo, null, 2));
-        
-        // 验证 store 中是否有这个 session
-        sessionStore.get(req.sessionID, (storeErr, storedSession) => {
-          if (storeErr) {
-            console.error('❌ 从 store 读取 Session 失败:', storeErr);
-          } else {
-            console.log('📦 Store 中的 Session:', storedSession ? '存在' : '不存在');
-            if (storedSession) {
-              console.log('📦 Store Session keys:', Object.keys(storedSession));
-            }
-          }
-          
-          res.json({ 
-            success: true, 
-            message: '登录成功',
-            sessionId: req.sessionID
-          });
-        });
-      });
+    console.log('✅ 登录成功，Token 已生成');
+    
+    res.json({ 
+      success: true, 
+      message: '登录成功',
+      token: token // 返回 Token
     });
   } else {
     console.log('❌ 密码错误');
@@ -381,31 +328,29 @@ app.post('/api/logout', (req, res) => {
   res.json({ success: true, message: '已登出' });
 });
 
-// 检查登录状态接口
+// 检查登录状态接口（验证 Token）
 app.get('/api/check-auth', (req, res) => {
-  // 禁用缓存，确保每次都返回最新状态
+  // 禁用缓存
   res.set({
     'Cache-Control': 'no-store, no-cache, must-revalidate, private',
     'Pragma': 'no-cache',
     'Expires': '0'
   });
   
-  const isAuthenticated = !!(req.session && req.session.isAuthenticated);
+  // 从请求头获取 Token
+  const authHeader = req.headers.authorization;
+  const token = authHeader && authHeader.split(' ')[1];
   
-  // 详细调试日志
-  console.log('🔍 check-auth 请求:', {
-    hasSession: !!req.session,
-    isAuthenticated: req.session?.isAuthenticated,
-    sessionId: req.sessionID,
-    cookieHeader: req.headers.cookie ? '存在' : '不存在',
-    cookieValue: req.headers.cookie,
-    origin: req.headers.origin,
-    sessionKeys: req.session ? Object.keys(req.session) : []
-  });
+  if (!token) {
+    return res.json({ success: true, isAuthenticated: false });
+  }
   
-  res.json({ 
-    success: true, 
-    isAuthenticated 
+  // 验证 Token
+  jwt.verify(token, JWT_SECRET, (err, decoded) => {
+    if (err) {
+      return res.json({ success: true, isAuthenticated: false });
+    }
+    res.json({ success: true, isAuthenticated: true });
   });
 });
 
