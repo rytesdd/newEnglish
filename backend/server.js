@@ -27,7 +27,7 @@ console.log('当前工作目录:', process.cwd());
 console.log('__dirname:', __dirname);
 console.log('Node 版本:', process.version);
 
-let express, cors, multer, execSync, pdfParse, mammoth, YoutubeTranscript, axios, parseString, DOMParser, ytdl, session, cookieParser;
+let express, cors, multer, execSync, pdfParse, mammoth, YoutubeTranscript, axios, parseString, DOMParser, ytdl, jwt;
 
 // 逐个加载依赖，以便精确定位问题
 try {
@@ -131,12 +131,11 @@ try {
 }
 
 try {
-  console.log('[12/12] 加载 express-session 和 cookie-parser...');
-  session = require('express-session');
-  cookieParser = require('cookie-parser');
-  console.log('      ✅ express-session 和 cookie-parser 加载成功');
+  console.log('[12/12] 加载 jsonwebtoken...');
+  jwt = require('jsonwebtoken');
+  console.log('      ✅ jsonwebtoken 加载成功');
 } catch (error) {
-  console.error('      ❌ express-session 或 cookie-parser 加载失败:', error.message);
+  console.error('      ❌ jsonwebtoken 加载失败:', error.message);
   throw error;
 }
 
@@ -168,7 +167,7 @@ app.use(cors({
       callback(null, true); // 临时允许所有 origin，生产环境建议严格限制
     }
   },
-  credentials: true, // 允许跨域携带 cookie
+  credentials: false // JWT 不需要 Cookie，设为 false
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'cache-control', 'pragma'],
   exposedHeaders: ['Set-Cookie']
@@ -376,14 +375,9 @@ app.post('/api/login', (req, res) => {
   }
 });
 
-// 登出接口
+// 登出接口（JWT 是无状态的，前端删除 Token 即可，这里只是返回成功）
 app.post('/api/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({ success: false, error: '登出失败' });
-    }
-    res.json({ success: true, message: '已登出' });
-  });
+  res.json({ success: true, message: '已登出' });
 });
 
 // 检查登录状态接口
@@ -414,25 +408,12 @@ app.get('/api/check-auth', (req, res) => {
   });
 });
 
-// 调试接口：查看 Session 详细信息
-app.get('/api/debug-session', (req, res) => {
+// 调试接口：查看 Token 信息
+app.get('/api/debug-token', requireLogin, (req, res) => {
   res.json({
     success: true,
-    session: {
-      exists: !!req.session,
-      id: req.sessionID,
-      isAuthenticated: req.session?.isAuthenticated,
-      keys: req.session ? Object.keys(req.session) : [],
-      fullSession: req.session
-    },
-    cookies: {
-      header: req.headers.cookie,
-      parsed: req.cookies
-    },
-    headers: {
-      origin: req.headers.origin,
-      cookie: req.headers.cookie
-    }
+    user: req.user,
+    token: req.headers.authorization
   });
 });
 

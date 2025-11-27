@@ -27,9 +27,22 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.CHECK_AUTH);
+      const token = localStorage.getItem('authToken');
+      if (!token) {
+        setIsAuthenticated(false);
+        setCheckingAuth(false);
+        return;
+      }
+      
+      const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
       setIsAuthenticated(response.data.isAuthenticated);
     } catch (error) {
+      // Token 无效，清除
+      localStorage.removeItem('authToken');
       setIsAuthenticated(false);
     } finally {
       setCheckingAuth(false);
@@ -37,26 +50,9 @@ function App() {
   };
 
   const handleLoginSuccess = async () => {
-    // 登录成功后，直接设置认证状态
-    // 不立即验证，因为登录接口已经返回成功了
+    // 登录成功后，Token 已经保存到 localStorage
+    // 直接设置认证状态
     setIsAuthenticated(true);
-    
-    // 延迟验证（可选，用于调试）
-    // 如果验证失败，也不影响当前登录状态，因为登录接口已经成功了
-    setTimeout(async () => {
-      try {
-        const response = await axios.get(API_ENDPOINTS.CHECK_AUTH);
-        if (!response.data.isAuthenticated) {
-          // 只记录日志，不改变登录状态
-          console.warn('⚠️ 登录状态验证失败，但保持登录状态（登录接口已成功）');
-        } else {
-          console.log('✅ 登录状态验证成功');
-        }
-      } catch (error) {
-        console.error('验证登录状态失败:', error);
-        // 即使验证失败，也保持登录状态（因为登录接口已经成功了）
-      }
-    }, 1000);
   };
 
   const handleLogout = async () => {

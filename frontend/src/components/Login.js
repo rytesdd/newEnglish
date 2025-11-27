@@ -17,9 +17,10 @@ const Login = ({ onLoginSuccess }) => {
         { password: values.password }
       );
 
-      if (response.data.success) {
+      if (response.data.success && response.data.token) {
+        // 保存 Token 到 localStorage
+        localStorage.setItem('authToken', response.data.token);
         message.success('登录成功');
-        // 立即调用，让前端先跳转，后台验证
         onLoginSuccess();
       } else {
         message.error(response.data.error || '登录失败');
