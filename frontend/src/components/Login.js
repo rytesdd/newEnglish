@@ -14,13 +14,7 @@ const Login = ({ onLoginSuccess }) => {
       setLoading(true);
       const response = await axios.post(
         API_URL,
-        { password: values.password },
-        {
-          withCredentials: true, // 重要：允许携带 cookie
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        }
+        { password: values.password }
       );
 
       if (response.data.success) {

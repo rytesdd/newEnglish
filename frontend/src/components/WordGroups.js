@@ -20,13 +20,7 @@ const WordGroups = ({ refreshTrigger }) => {
   const fetchWordGroups = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(API_ENDPOINTS.WORD_GROUPS, {
-        withCredentials: true,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
+      const response = await axios.get(API_ENDPOINTS.WORD_GROUPS);
       if (response.data.success) {
         setGroups(response.data.groups || []);
       } else {

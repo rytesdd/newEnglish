@@ -27,13 +27,7 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
-        withCredentials: true,
-        headers: {
-          'Cache-Control': 'no-cache',
-          'Pragma': 'no-cache'
-        }
-      });
+      const response = await axios.get(API_ENDPOINTS.CHECK_AUTH);
       setIsAuthenticated(response.data.isAuthenticated);
     } catch (error) {
       setIsAuthenticated(false);
@@ -51,13 +45,7 @@ function App() {
     // 如果验证失败，也不影响当前登录状态，因为登录接口已经成功了
     setTimeout(async () => {
       try {
-        const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
-          withCredentials: true,
-          headers: {
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache'
-          }
-        });
+        const response = await axios.get(API_ENDPOINTS.CHECK_AUTH);
         if (!response.data.isAuthenticated) {
           // 只记录日志，不改变登录状态
           console.warn('⚠️ 登录状态验证失败，但保持登录状态（登录接口已成功）');
