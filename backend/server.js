@@ -209,9 +209,22 @@ app.use(session({
 
 // 登录验证中间件
 const requireLogin = (req, res, next) => {
-  if (req.session.isAuthenticated) {
+  // 调试日志
+  console.log('🔐 验证登录状态:', {
+    hasSession: !!req.session,
+    isAuthenticated: req.session?.isAuthenticated,
+    sessionId: req.sessionID,
+    cookies: req.cookies,
+    headers: {
+      origin: req.headers.origin,
+      cookie: req.headers.cookie
+    }
+  });
+  
+  if (req.session && req.session.isAuthenticated) {
     next();
   } else {
+    console.log('❌ 未通过登录验证');
     res.status(401).json({ success: false, error: '请先登录' });
   }
 };
@@ -284,10 +297,32 @@ async function parseWord(filePath) {
 app.post('/api/login', (req, res) => {
   const { password } = req.body;
   
+  console.log('🔑 登录请求:', {
+    hasSession: !!req.session,
+    sessionId: req.sessionID,
+    origin: req.headers.origin,
+    cookie: req.headers.cookie
+  });
+  
   if (password === PASSWORD) {
     req.session.isAuthenticated = true;
-    res.json({ success: true, message: '登录成功' });
+    
+    // 显式保存 Session
+    req.session.save((err) => {
+      if (err) {
+        console.error('❌ Session 保存失败:', err);
+        return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
+      }
+      
+      console.log('✅ 登录成功，Session 已保存:', {
+        sessionId: req.sessionID,
+        isAuthenticated: req.session.isAuthenticated
+      });
+      
+      res.json({ success: true, message: '登录成功' });
+    });
   } else {
+    console.log('❌ 密码错误');
     res.status(401).json({ success: false, error: '密码错误' });
   }
 });

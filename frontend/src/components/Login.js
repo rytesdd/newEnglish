@@ -25,7 +25,10 @@ const Login = ({ onLoginSuccess }) => {
 
       if (response.data.success) {
         message.success('登录成功');
-        onLoginSuccess();
+        // 等待一下确保 Cookie 被浏览器保存
+        setTimeout(() => {
+          onLoginSuccess();
+        }, 100);
       } else {
         message.error(response.data.error || '登录失败');
       }

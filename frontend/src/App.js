@@ -38,8 +38,9 @@ function App() {
     }
   };
 
-  const handleLoginSuccess = () => {
-    setIsAuthenticated(true);
+  const handleLoginSuccess = async () => {
+    // 登录成功后，重新检查认证状态以确保 Session 正确
+    await checkAuthStatus();
   };
 
   const handleLogout = async () => {
