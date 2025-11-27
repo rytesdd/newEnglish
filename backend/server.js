@@ -1232,13 +1232,15 @@ app.delete('/api/word-groups/:groupName/words/:wordKey', requireLogin, (req, res
 });
 
 // 启动服务器
-app.listen(PORT, () => {
-  console.log(`服务器运行在端口 ${PORT}`);
-  console.log(`当前工作目录: ${process.cwd()}`);
-  console.log(`__dirname: ${__dirname}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`✅ 服务器运行在端口 ${PORT}`);
+  console.log(`📁 当前工作目录: ${process.cwd()}`);
+  console.log(`📂 __dirname: ${__dirname}`);
+  console.log(`🌐 监听地址: 0.0.0.0:${PORT}`);
   if (process.env.NODE_ENV !== 'production') {
-    console.log(`访问地址: http://localhost:${PORT}`);
+    console.log(`🔗 访问地址: http://localhost:${PORT}`);
   }
+  console.log(`🚀 服务器已启动，等待请求...`);
 });
 
 // 错误处理
