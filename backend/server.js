@@ -207,7 +207,10 @@ app.use(session({
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 小时
     sameSite: 'none', // 跨域必须使用 'none'
-    path: '/' // 明确设置 path
+    path: '/', // 明确设置 path
+    // 不设置 domain，让浏览器自动处理跨域 cookie
+    // 如果设置了 domain，跨域时可能无法发送 cookie
+    domain: undefined
   },
   name: 'connect.sid' // 明确指定 cookie 名称
 }));
