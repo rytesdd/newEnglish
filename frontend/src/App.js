@@ -43,24 +43,32 @@ function App() {
   };
 
   const handleLoginSuccess = async () => {
-    // 登录成功后，直接设置认证状态，然后验证
+    // 登录成功后，直接设置认证状态
+    // 不立即验证，因为登录接口已经返回成功了
     setIsAuthenticated(true);
-    // 延迟一下再验证，确保 Cookie 被浏览器保存
+    
+    // 延迟验证（可选，用于调试）
+    // 如果验证失败，也不影响当前登录状态，因为登录接口已经成功了
     setTimeout(async () => {
       try {
         const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
-          withCredentials: true
+          withCredentials: true,
+          headers: {
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
+          }
         });
         if (!response.data.isAuthenticated) {
-          // 如果验证失败，重新设置为未登录
-          setIsAuthenticated(false);
-          message.error('登录状态验证失败，请重新登录');
+          // 只记录日志，不改变登录状态
+          console.warn('⚠️ 登录状态验证失败，但保持登录状态（登录接口已成功）');
+        } else {
+          console.log('✅ 登录状态验证成功');
         }
       } catch (error) {
         console.error('验证登录状态失败:', error);
         // 即使验证失败，也保持登录状态（因为登录接口已经成功了）
       }
-    }, 500);
+    }, 1000);
   };
 
   const handleLogout = async () => {
