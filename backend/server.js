@@ -202,7 +202,8 @@ app.use(session({
     secure: true, // 生产环境必须使用 HTTPS，设为 true
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 小时
-    sameSite: 'none' // 跨域必须使用 'none'
+    sameSite: 'none', // 跨域必须使用 'none'
+    domain: undefined // 不设置 domain，让浏览器自动处理跨域 cookie
   },
   name: 'connect.sid' // 明确指定 cookie 名称
 }));
@@ -1316,6 +1317,7 @@ app.get('/api/word-groups', requireLogin, (req, res) => {
     });
     
     const groups = readWordGroups();
+    console.log('✅ 成功获取背单词分组，数量:', groups.length);
     res.json({ success: true, groups });
   } catch (error) {
     console.error('获取背单词分组失败:', error);
