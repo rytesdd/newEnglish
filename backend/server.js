@@ -155,7 +155,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ['http://localhost:3000'];
 
 // 中间件
-// 注意：CORS 必须在 cookieParser 之前配置
+// CORS 配置
 app.use(cors({
   origin: function (origin, callback) {
     // 允许没有 origin 的请求（如移动应用或 Postman）
