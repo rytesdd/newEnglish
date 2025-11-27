@@ -217,8 +217,8 @@ app.use(session({
 
 // 登录验证中间件
 const requireLogin = (req, res, next) => {
-  // 详细调试日志
-  console.log('🔐 验证登录状态:', {
+  // 详细调试日志 - 每次都输出，方便排查
+  const debugInfo = {
     hasSession: !!req.session,
     isAuthenticated: req.session?.isAuthenticated,
     sessionId: req.sessionID,
@@ -226,16 +226,23 @@ const requireLogin = (req, res, next) => {
     cookieValue: req.headers.cookie,
     origin: req.headers.origin,
     url: req.url,
-    sessionKeys: req.session ? Object.keys(req.session) : []
-  });
+    sessionKeys: req.session ? Object.keys(req.session) : [],
+    sessionData: req.session ? JSON.stringify(req.session) : 'null'
+  };
+  
+  console.log('🔐 验证登录状态:', JSON.stringify(debugInfo, null, 2));
   
   if (!req.session || !req.session.isAuthenticated) {
-    console.log('❌ 未通过登录验证');
-    return res.status(401).json({ success: false, error: '请先登录' });
+    console.log('❌ 未通过登录验证 - 详细信息:', JSON.stringify(debugInfo, null, 2));
+    return res.status(401).json({ 
+      success: false, 
+      error: '请先登录',
+      debug: process.env.NODE_ENV === 'development' ? debugInfo : undefined
+    });
   }
   
   // 验证通过，继续处理
-  console.log('✅ 登录验证通过');
+  console.log('✅ 登录验证通过 - Session ID:', req.sessionID);
   next();
 };
 
@@ -372,19 +379,42 @@ app.get('/api/check-auth', (req, res) => {
   
   const isAuthenticated = !!(req.session && req.session.isAuthenticated);
   
-  // 调试日志
-  if (!isAuthenticated) {
-    console.log('🔍 check-auth 返回未登录:', {
-      hasSession: !!req.session,
-      sessionId: req.sessionID,
-      cookieHeader: req.headers.cookie ? '存在' : '不存在',
-      origin: req.headers.origin
-    });
-  }
+  // 详细调试日志
+  console.log('🔍 check-auth 请求:', {
+    hasSession: !!req.session,
+    isAuthenticated: req.session?.isAuthenticated,
+    sessionId: req.sessionID,
+    cookieHeader: req.headers.cookie ? '存在' : '不存在',
+    cookieValue: req.headers.cookie,
+    origin: req.headers.origin,
+    sessionKeys: req.session ? Object.keys(req.session) : []
+  });
   
   res.json({ 
     success: true, 
     isAuthenticated 
+  });
+});
+
+// 调试接口：查看 Session 详细信息
+app.get('/api/debug-session', (req, res) => {
+  res.json({
+    success: true,
+    session: {
+      exists: !!req.session,
+      id: req.sessionID,
+      isAuthenticated: req.session?.isAuthenticated,
+      keys: req.session ? Object.keys(req.session) : [],
+      fullSession: req.session
+    },
+    cookies: {
+      header: req.headers.cookie,
+      parsed: req.cookies
+    },
+    headers: {
+      origin: req.headers.origin,
+      cookie: req.headers.cookie
+    }
   });
 });
 
