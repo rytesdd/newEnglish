@@ -39,8 +39,24 @@ function App() {
   };
 
   const handleLoginSuccess = async () => {
-    // 登录成功后，重新检查认证状态以确保 Session 正确
-    await checkAuthStatus();
+    // 登录成功后，直接设置认证状态，然后验证
+    setIsAuthenticated(true);
+    // 延迟一下再验证，确保 Cookie 被浏览器保存
+    setTimeout(async () => {
+      try {
+        const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
+          withCredentials: true
+        });
+        if (!response.data.isAuthenticated) {
+          // 如果验证失败，重新设置为未登录
+          setIsAuthenticated(false);
+          message.error('登录状态验证失败，请重新登录');
+        }
+      } catch (error) {
+        console.error('验证登录状态失败:', error);
+        // 即使验证失败，也保持登录状态（因为登录接口已经成功了）
+      }
+    }, 500);
   };
 
   const handleLogout = async () => {
