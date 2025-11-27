@@ -1,24 +1,45 @@
 // 加载环境变量（支持从根目录或 backend 目录运行）
 const path = require('path');
 const fs = require('fs-extra');
-const dotenvPath = fs.existsSync(path.join(__dirname, '../.env'))
-  ? path.join(__dirname, '../.env')
-  : path.join(__dirname, '../../.env');
-require('dotenv').config({ path: dotenvPath });
 
-const express = require('express');
-const cors = require('cors');
-const multer = require('multer');
-const { execSync } = require('child_process');
-const pdfParse = require('pdf-parse');
-const mammoth = require('mammoth');
-const { YoutubeTranscript } = require('youtube-transcript');
-const axios = require('axios');
-const { parseString } = require('xml2js');
-const { DOMParser } = require('@xmldom/xmldom');
-const ytdl = require('ytdl-core');
-const session = require('express-session');
-const cookieParser = require('cookie-parser');
+// 安全加载 dotenv
+try {
+  const dotenvPath = fs.existsSync(path.join(__dirname, '../.env'))
+    ? path.join(__dirname, '../.env')
+    : path.join(__dirname, '../../.env');
+  if (fs.existsSync(dotenvPath)) {
+    require('dotenv').config({ path: dotenvPath });
+  } else {
+    require('dotenv').config(); // 尝试默认路径
+  }
+} catch (e) {
+  console.warn('加载 .env 文件失败，使用环境变量:', e.message);
+}
+
+// 安全加载所有依赖
+let express, cors, multer, execSync, pdfParse, mammoth, YoutubeTranscript, axios, parseString, DOMParser, ytdl, session, cookieParser;
+
+try {
+  express = require('express');
+  cors = require('cors');
+  multer = require('multer');
+  execSync = require('child_process').execSync;
+  pdfParse = require('pdf-parse');
+  mammoth = require('mammoth');
+  YoutubeTranscript = require('youtube-transcript').YoutubeTranscript;
+  axios = require('axios');
+  parseString = require('xml2js').parseString;
+  DOMParser = require('@xmldom/xmldom').DOMParser;
+  ytdl = require('ytdl-core');
+  session = require('express-session');
+  cookieParser = require('cookie-parser');
+} catch (error) {
+  console.error('加载依赖失败:', error.message);
+  console.error('错误堆栈:', error.stack);
+  console.error('当前工作目录:', process.cwd());
+  console.error('__dirname:', __dirname);
+  process.exit(1);
+}
 
 const app = express();
 const PORT = process.env.PORT || 3001;

@@ -3,7 +3,7 @@ nixPkgs = ["nodejs-18_x", "python311", "pip"]
 
 [phases.install]
 cmds = [
-  "cd backend && npm install",
+  "cd backend && npm install --production",
   "python3 -m venv /opt/venv",
   "/opt/venv/bin/pip install youtube-transcript-api"
 ]
