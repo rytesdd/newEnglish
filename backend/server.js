@@ -1400,7 +1400,7 @@ console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 console.log(`工作目录: ${process.cwd()}`);
 console.log(`__dirname: ${__dirname}`);
 console.log(`PASSWORD 已设置: ${!!PASSWORD}`);
-console.log(`SESSION_SECRET 已设置: ${!!SESSION_SECRET}`);
+console.log(`JWT_SECRET 已设置: ${!!JWT_SECRET}`);
 console.log('================');
 
 // 启动服务器
