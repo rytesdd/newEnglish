@@ -21,7 +21,11 @@ const WordGroups = ({ refreshTrigger }) => {
     try {
       setLoading(true);
       const response = await axios.get(API_ENDPOINTS.WORD_GROUPS, {
-        withCredentials: true
+        withCredentials: true,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
       if (response.data.success) {
         setGroups(response.data.groups || []);

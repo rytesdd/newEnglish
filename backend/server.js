@@ -339,6 +339,13 @@ app.post('/api/logout', (req, res) => {
 
 // 检查登录状态接口
 app.get('/api/check-auth', (req, res) => {
+  // 禁用缓存，确保每次都返回最新状态
+  res.set({
+    'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+    'Pragma': 'no-cache',
+    'Expires': '0'
+  });
+  
   res.json({ 
     success: true, 
     isAuthenticated: !!req.session.isAuthenticated 
@@ -1293,6 +1300,13 @@ app.post('/api/word-groups/add', requireLogin, (req, res) => {
 // 获取所有背单词分组（需要登录）
 app.get('/api/word-groups', requireLogin, (req, res) => {
   try {
+    // 禁用缓存
+    res.set({
+      'Cache-Control': 'no-store, no-cache, must-revalidate, private',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
+    
     const groups = readWordGroups();
     res.json({ success: true, groups });
   } catch (error) {

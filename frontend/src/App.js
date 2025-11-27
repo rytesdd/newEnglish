@@ -28,7 +28,11 @@ function App() {
   const checkAuthStatus = async () => {
     try {
       const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
-        withCredentials: true
+        withCredentials: true,
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
       });
       setIsAuthenticated(response.data.isAuthenticated);
     } catch (error) {
