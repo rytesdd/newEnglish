@@ -199,11 +199,12 @@ app.use(session({
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: isProduction, // 生产环境使用 HTTPS 时设为 true
+    secure: true, // 生产环境必须使用 HTTPS，设为 true
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 小时
-    sameSite: isProduction ? 'none' : 'lax' // 生产环境跨域需要 none
-  }
+    sameSite: 'none' // 跨域必须使用 'none'
+  },
+  name: 'connect.sid' // 明确指定 cookie 名称
 }));
 
 // 登录验证中间件
