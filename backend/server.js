@@ -198,10 +198,11 @@ if (isProduction) {
 }
 
 // 配置 session
+// 使用内存存储（默认），但在 Railway 上可能需要持久化存储
 app.use(session({
   secret: SESSION_SECRET,
-  resave: true, // 改为 true，确保每次请求都保存 session
-  saveUninitialized: false,
+  resave: true, // 每次请求都保存 session
+  saveUninitialized: true, // 改为 true，即使未初始化也保存，确保 Session ID 一致
   cookie: {
     secure: true, // 生产环境必须使用 HTTPS，设为 true
     httpOnly: true,
@@ -209,7 +210,6 @@ app.use(session({
     sameSite: 'none', // 跨域必须使用 'none'
     path: '/', // 明确设置 path
     // 不设置 domain，让浏览器自动处理跨域 cookie
-    // 如果设置了 domain，跨域时可能无法发送 cookie
     domain: undefined
   },
   name: 'connect.sid' // 明确指定 cookie 名称
@@ -322,59 +322,36 @@ app.post('/api/login', (req, res) => {
   });
   
   if (password === PASSWORD) {
-    // 先设置认证状态
-    req.session.isAuthenticated = true;
-    
     // 确保响应头包含正确的 CORS 设置
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
     
-    // 手动触发 Session 保存，确保 isAuthenticated 被保存
-    // 使用 req.session.regenerate 重新生成 Session，确保 Cookie 更新
-    req.session.regenerate((err) => {
+    // 直接设置认证状态（不使用 regenerate，避免创建新 Session）
+    req.session.isAuthenticated = true;
+    
+    // 强制保存 Session
+    req.session.save((err) => {
       if (err) {
-        console.error('❌ Session 重新生成失败:', err);
-        // 如果重新生成失败，尝试直接保存
-        req.session.isAuthenticated = true;
-        return req.session.save((saveErr) => {
-          if (saveErr) {
-            console.error('❌ Session 保存失败:', saveErr);
-            return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
-          }
-          
-          const sessionInfo = {
-            sessionId: req.sessionID,
-            isAuthenticated: req.session.isAuthenticated,
-            cookieHeader: res.getHeader('Set-Cookie'),
-            sessionKeys: Object.keys(req.session),
-            sessionData: JSON.stringify(req.session)
-          };
-          
-          console.log('✅ 登录成功，Session 已保存:', JSON.stringify(sessionInfo, null, 2));
-          res.json({ success: true, message: '登录成功', sessionId: req.sessionID });
-        });
+        console.error('❌ Session 保存失败:', err);
+        return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
       }
       
-      // Session 重新生成成功，设置认证状态
-      req.session.isAuthenticated = true;
+      // 验证 Session 是否真的保存了
+      const sessionInfo = {
+        sessionId: req.sessionID,
+        isAuthenticated: req.session.isAuthenticated,
+        cookieHeader: res.getHeader('Set-Cookie'),
+        sessionKeys: Object.keys(req.session),
+        sessionData: JSON.stringify(req.session)
+      };
       
-      // 保存新 Session
-      req.session.save((saveErr) => {
-        if (saveErr) {
-          console.error('❌ Session 保存失败:', saveErr);
-          return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
-        }
-        
-        const sessionInfo = {
-          sessionId: req.sessionID,
-          isAuthenticated: req.session.isAuthenticated,
-          cookieHeader: res.getHeader('Set-Cookie'),
-          sessionKeys: Object.keys(req.session),
-          sessionData: JSON.stringify(req.session)
-        };
-        
-        console.log('✅ 登录成功，Session 已重新生成并保存:', JSON.stringify(sessionInfo, null, 2));
-        res.json({ success: true, message: '登录成功', sessionId: req.sessionID });
+      console.log('✅ 登录成功，Session 已保存:', JSON.stringify(sessionInfo, null, 2));
+      
+      // 确保响应包含正确的 Session ID
+      res.json({ 
+        success: true, 
+        message: '登录成功',
+        sessionId: req.sessionID // 返回 Session ID 用于调试
       });
     });
   } else {
