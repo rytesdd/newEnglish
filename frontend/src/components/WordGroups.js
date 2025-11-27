@@ -25,10 +25,26 @@ const WordGroups = ({ refreshTrigger }) => {
       });
       if (response.data.success) {
         setGroups(response.data.groups || []);
+      } else {
+        console.error('获取背单词分组失败:', response.data);
+        message.error(response.data.error || '获取背单词分组失败');
       }
     } catch (error) {
       console.error('获取背单词分组失败:', error);
-      message.error('获取背单词分组失败');
+      let errorMsg = '获取背单词分组失败';
+      if (error.response) {
+        // 服务器返回了错误响应
+        if (error.response.status === 401) {
+          errorMsg = '请先登录';
+        } else {
+          errorMsg = error.response.data?.error || `服务器错误: ${error.response.status}`;
+        }
+      } else if (error.request) {
+        errorMsg = '无法连接到服务器';
+      } else {
+        errorMsg = error.message || '获取背单词分组失败';
+      }
+      message.error(errorMsg);
     } finally {
       setLoading(false);
     }
