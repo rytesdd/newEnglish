@@ -1,0 +1,14 @@
+[phases.setup]
+nixPkgs = ["nodejs-18_x", "python311"]
+
+[phases.install]
+cmds = [
+  "cd backend && npm install",
+  "pip install --user --break-system-packages youtube-transcript-api"
+]
+
+[phases.build]
+cmds = []
+
+[start]
+cmd = "cd backend && npm start"
