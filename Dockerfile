@@ -14,8 +14,10 @@ FROM node:18-alpine
 # 安装 Python 和 pip（用于 YouTube 字幕获取）
 RUN apk add --no-cache python3 py3-pip
 
-# 安装 Python 依赖
-RUN pip3 install youtube-transcript-api
+# 安装 Python 依赖（使用虚拟环境）
+RUN python3 -m venv /opt/venv && \
+    /opt/venv/bin/pip install youtube-transcript-api && \
+    ln -s /opt/venv/bin/python3 /usr/local/bin/python3-venv
 
 WORKDIR /app
 

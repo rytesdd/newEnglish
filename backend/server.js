@@ -6,6 +6,7 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs-extra');
+const { execSync } = require('child_process');
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
 const { YoutubeTranscript } = require('youtube-transcript');
@@ -730,13 +731,15 @@ app.post('/api/youtube-transcript', requireLogin, async (req, res) => {
       let transcriptCount = 0;
       
       // 使用 Python 脚本获取字幕（最可靠）
-      const { execSync } = require('child_process');
-      const path = require('path');
       const pythonScript = path.join(__dirname, 'get_youtube_transcript.py');
       
       try {
         console.log('使用 Python youtube-transcript-api 获取字幕...');
-        const result = execSync(`python3 "${pythonScript}" "${videoId}" "en,zh"`, {
+        // 尝试使用虚拟环境的 Python，如果不存在则使用系统 Python
+        const pythonCmd = fs.existsSync('/opt/venv/bin/python3') 
+          ? '/opt/venv/bin/python3' 
+          : 'python3';
+        const result = execSync(`${pythonCmd} "${pythonScript}" "${videoId}" "en,zh"`, {
           encoding: 'utf-8',
           timeout: 30000,
           maxBuffer: 10 * 1024 * 1024 // 10MB
