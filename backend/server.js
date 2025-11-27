@@ -50,8 +50,10 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// 在生产环境中，如果前端构建文件存在，提供静态文件服务
+// 配置生产环境标识
 const isProduction = process.env.NODE_ENV === 'production';
+
+// 在生产环境中，如果前端构建文件存在，提供静态文件服务
 if (isProduction) {
   // 支持从根目录或 backend 目录运行
   const frontendBuildPath = fs.existsSync(path.join(__dirname, '../frontend/build'))
@@ -70,7 +72,6 @@ if (isProduction) {
 }
 
 // 配置 session
-const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
