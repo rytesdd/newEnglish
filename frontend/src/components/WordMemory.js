@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button, Card, Space, Typography } from 'antd';
 import './WordMemory.css';
 
-const { Text } = Typography;
+const { Title, Text } = Typography;
 
 const WordMemory = ({ group, onExit }) => {
   const [words] = useState(group.words || []);
