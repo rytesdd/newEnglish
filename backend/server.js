@@ -217,25 +217,25 @@ app.use(session({
 
 // 登录验证中间件
 const requireLogin = (req, res, next) => {
-  // 调试日志（减少日志输出，只在验证失败时输出）
+  // 详细调试日志
+  console.log('🔐 验证登录状态:', {
+    hasSession: !!req.session,
+    isAuthenticated: req.session?.isAuthenticated,
+    sessionId: req.sessionID,
+    cookieHeader: req.headers.cookie ? '存在' : '不存在',
+    cookieValue: req.headers.cookie,
+    origin: req.headers.origin,
+    url: req.url,
+    sessionKeys: req.session ? Object.keys(req.session) : []
+  });
+  
   if (!req.session || !req.session.isAuthenticated) {
-    console.log('❌ 未通过登录验证:', {
-      hasSession: !!req.session,
-      isAuthenticated: req.session?.isAuthenticated,
-      sessionId: req.sessionID,
-      cookieHeader: req.headers.cookie ? '存在' : '不存在',
-      cookieValue: req.headers.cookie,
-      origin: req.headers.origin,
-      url: req.url
-    });
+    console.log('❌ 未通过登录验证');
     return res.status(401).json({ success: false, error: '请先登录' });
   }
   
   // 验证通过，继续处理
-  console.log('✅ 登录验证通过:', {
-    sessionId: req.sessionID,
-    url: req.url
-  });
+  console.log('✅ 登录验证通过');
   next();
 };
 
@@ -324,25 +324,26 @@ app.post('/api/login', (req, res) => {
         return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
       }
       
-      console.log('✅ 登录成功，Session 已保存:', {
-        sessionId: req.sessionID,
-        isAuthenticated: req.session.isAuthenticated,
-        cookieHeader: res.getHeader('Set-Cookie')
-      });
-      
       // 确保响应头包含正确的 CORS 设置
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
       
-      // Session 中间件会自动设置 Cookie，不需要手动设置
-      // 但我们可以确保 Session 被保存
+      // 再次保存 Session 确保持久化
       req.session.save((saveErr) => {
         if (saveErr) {
           console.error('❌ Session 二次保存失败:', saveErr);
+          return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
         }
+        
+        console.log('✅ 登录成功，Session 已保存:', {
+          sessionId: req.sessionID,
+          isAuthenticated: req.session.isAuthenticated,
+          cookieHeader: res.getHeader('Set-Cookie'),
+          sessionKeys: Object.keys(req.session)
+        });
+        
+        res.json({ success: true, message: '登录成功' });
       });
-      
-      res.json({ success: true, message: '登录成功' });
     });
   } else {
     console.log('❌ 密码错误');
