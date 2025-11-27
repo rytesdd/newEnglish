@@ -170,7 +170,7 @@ app.use(cors({
   },
   credentials: true, // 允许跨域携带 cookie
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'cache-control', 'pragma'],
   exposedHeaders: ['Set-Cookie']
 }));
 app.use(express.json());
