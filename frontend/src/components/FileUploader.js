@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { API_ENDPOINTS } from '../config/api';
 import './FileUploader.css';
 

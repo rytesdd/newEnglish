@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { Input, Form, message } from 'antd';
 import { API_ENDPOINTS } from '../config/api';
 import './YouTubeInput.css';

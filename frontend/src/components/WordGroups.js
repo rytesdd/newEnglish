@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { Button, List, Typography, Space, message, Empty, Collapse } from 'antd';
 import { API_ENDPOINTS } from '../config/api';
 import WordMemory from './WordMemory';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { message } from 'antd';
 import { API_ENDPOINTS } from '../config/api';
 import './TextDisplay.css';

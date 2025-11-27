@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
-import axios from 'axios';
+import axios from '../axiosConfig';
 import { API_ENDPOINTS } from '../config/api';
 import './Login.css';
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axios from './axiosConfig';
 import { Button, message } from 'antd';
 import { API_ENDPOINTS } from './config/api';
 import './App.css';
@@ -73,9 +73,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post(API_ENDPOINTS.LOGOUT, {}, {
-        withCredentials: true
-      });
+      await axios.post(API_ENDPOINTS.LOGOUT, {});
       setIsAuthenticated(false);
       message.success('已登出');
       // 清空当前内容
