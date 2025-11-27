@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, List, Typography, Space, message, Empty, Collapse } from 'antd';
+import { API_ENDPOINTS } from '../config/api';
 import WordMemory from './WordMemory';
 import './WordGroups.css';
 
@@ -19,7 +20,7 @@ const WordGroups = ({ refreshTrigger }) => {
   const fetchWordGroups = async () => {
     try {
       setLoading(true);
-      const response = await axios.get('http://localhost:3001/api/word-groups', {
+      const response = await axios.get(API_ENDPOINTS.WORD_GROUPS, {
         withCredentials: true
       });
       if (response.data.success) {

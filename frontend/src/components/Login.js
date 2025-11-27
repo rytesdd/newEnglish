@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, message } from 'antd';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 import './Login.css';
 
 const Login = ({ onLoginSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-  const API_URL = 'http://localhost:3001/api/login';
+  const API_URL = API_ENDPOINTS.LOGIN;
 
   const handleLogin = async (values) => {
     try {

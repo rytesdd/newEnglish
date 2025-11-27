@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Button, message } from 'antd';
+import { API_ENDPOINTS } from './config/api';
 import './App.css';
 import Login from './components/Login';
 import FileUploader from './components/FileUploader';
@@ -26,7 +27,7 @@ function App() {
 
   const checkAuthStatus = async () => {
     try {
-      const response = await axios.get('http://localhost:3001/api/check-auth', {
+      const response = await axios.get(API_ENDPOINTS.CHECK_AUTH, {
         withCredentials: true
       });
       setIsAuthenticated(response.data.isAuthenticated);
@@ -43,7 +44,7 @@ function App() {
 
   const handleLogout = async () => {
     try {
-      await axios.post('http://localhost:3001/api/logout', {}, {
+      await axios.post(API_ENDPOINTS.LOGOUT, {}, {
         withCredentials: true
       });
       setIsAuthenticated(false);

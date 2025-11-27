@@ -1,10 +1,11 @@
 import React, { useRef } from 'react';
 import axios from 'axios';
+import { API_ENDPOINTS } from '../config/api';
 import './FileUploader.css';
 
 const FileUploader = ({ onFileParsed, onError, onLoading }) => {
   const fileInputRef = useRef(null);
-  const API_URL = 'http://localhost:3001/api/upload';
+  const API_URL = API_ENDPOINTS.UPLOAD;
 
   const handleFileSelect = async (event) => {
     const file = event.target.files[0];

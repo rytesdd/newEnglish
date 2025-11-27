@@ -17,29 +17,61 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
 // 密码配置（从环境变量读取）
 const PASSWORD = process.env.PASSWORD || 'Wzy1996.';
 const SESSION_SECRET = process.env.SESSION_SECRET || 'file-parser-secret-key-2024';
 
+// 配置 CORS - 支持生产环境
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',')
+  : ['http://localhost:3000'];
+
 // 中间件
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: function (origin, callback) {
+    // 允许没有 origin 的请求（如移动应用或 Postman）
+    if (!origin) return callback(null, true);
+    
+    // 检查 origin 是否在允许列表中
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      callback(null, true); // 临时允许所有 origin，生产环境建议严格限制
+    }
+  },
   credentials: true // 允许跨域携带 cookie
 }));
 app.use(express.json());
 app.use(cookieParser());
 
+// 在生产环境中，如果前端构建文件存在，提供静态文件服务
+const isProduction = process.env.NODE_ENV === 'production';
+if (isProduction) {
+  const frontendBuildPath = path.join(__dirname, '../frontend/build');
+  if (fs.existsSync(frontendBuildPath)) {
+    app.use(express.static(frontendBuildPath));
+    // 所有非 API 路由都返回前端应用
+    app.get('*', (req, res) => {
+      if (!req.path.startsWith('/api')) {
+        res.sendFile(path.join(frontendBuildPath, 'index.html'));
+      }
+    });
+  }
+}
+
 // 配置 session
+const isProduction = process.env.NODE_ENV === 'production';
 app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: false, // 开发环境设为 false，生产环境使用 HTTPS 时设为 true
+    secure: isProduction, // 生产环境使用 HTTPS 时设为 true
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000 // 24 小时
+    maxAge: 24 * 60 * 60 * 1000, // 24 小时
+    sameSite: isProduction ? 'none' : 'lax' // 生产环境跨域需要 none
   }
 }));
 
@@ -1163,7 +1195,10 @@ app.delete('/api/word-groups/:groupName/words/:wordKey', requireLogin, (req, res
 });
 
 app.listen(PORT, () => {
-  console.log(`服务器运行在 http://localhost:${PORT}`);
+  console.log(`服务器运行在端口 ${PORT}`);
+  if (process.env.NODE_ENV !== 'production') {
+    console.log(`访问地址: http://localhost:${PORT}`);
+  }
 });
 
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import axios from 'axios';
 import { message } from 'antd';
+import { API_ENDPOINTS } from '../config/api';
 import './TextDisplay.css';
 
 const TextDisplay = ({ text, filename, onWordsSaved }) => {
@@ -393,7 +394,7 @@ const TextDisplay = ({ text, filename, onWordsSaved }) => {
       }));
 
       const response = await axios.post(
-        'http://localhost:3001/api/word-groups/add',
+        API_ENDPOINTS.WORD_GROUPS_ADD,
         { groupName, words },
         { withCredentials: true }
       );
@@ -437,7 +438,7 @@ const TextDisplay = ({ text, filename, onWordsSaved }) => {
         isPhrase: item.isPhrase
       }));
 
-      const response = await axios.post('http://localhost:3001/api/translate', {
+      const response = await axios.post(API_ENDPOINTS.TRANSLATE, {
         items: translateRequest,
         context: text // 传递上下文原文
       }, {

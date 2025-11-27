@@ -1,12 +1,13 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { Input, Form, message } from 'antd';
+import { API_ENDPOINTS } from '../config/api';
 import './YouTubeInput.css';
 
 const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
   const [url, setUrl] = useState('');
   const [form] = Form.useForm();
-  const API_URL = 'http://localhost:3001/api/youtube-transcript';
+  const API_URL = API_ENDPOINTS.YOUTUBE_TRANSCRIPT;
   const submitTimeoutRef = useRef(null);
 
   const fetchTranscript = async (urlToFetch) => {
