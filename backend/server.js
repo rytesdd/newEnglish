@@ -1209,11 +1209,26 @@ app.delete('/api/word-groups/:groupName/words/:wordKey', requireLogin, (req, res
   }
 });
 
+// 启动服务器
 app.listen(PORT, () => {
   console.log(`服务器运行在端口 ${PORT}`);
+  console.log(`当前工作目录: ${process.cwd()}`);
+  console.log(`__dirname: ${__dirname}`);
   if (process.env.NODE_ENV !== 'production') {
     console.log(`访问地址: http://localhost:${PORT}`);
   }
+});
+
+// 错误处理
+process.on('uncaughtException', (error) => {
+  console.error('未捕获的异常:', error);
+  console.error('错误堆栈:', error.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('未处理的 Promise 拒绝:', reason);
+  console.error('Promise:', promise);
 });
 
 
