@@ -26,7 +26,8 @@ try {
   execSync = require('child_process').execSync;
   pdfParse = require('pdf-parse');
   mammoth = require('mammoth');
-  YoutubeTranscript = require('youtube-transcript').YoutubeTranscript;
+  const youtubeTranscriptModule = require('youtube-transcript');
+  YoutubeTranscript = youtubeTranscriptModule.YoutubeTranscript || youtubeTranscriptModule;
   axios = require('axios');
   parseString = require('xml2js').parseString;
   DOMParser = require('@xmldom/xmldom').DOMParser;
