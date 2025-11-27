@@ -17,28 +17,44 @@ try {
 }
 
 // 安全加载所有依赖
+console.log('开始加载依赖...');
 let express, cors, multer, execSync, pdfParse, mammoth, YoutubeTranscript, axios, parseString, DOMParser, ytdl, session, cookieParser;
 
 try {
+  console.log('加载 express...');
   express = require('express');
+  console.log('加载 cors...');
   cors = require('cors');
+  console.log('加载 multer...');
   multer = require('multer');
+  console.log('加载 child_process...');
   execSync = require('child_process').execSync;
+  console.log('加载 pdf-parse...');
   pdfParse = require('pdf-parse');
+  console.log('加载 mammoth...');
   mammoth = require('mammoth');
+  console.log('加载 youtube-transcript...');
   const youtubeTranscriptModule = require('youtube-transcript');
   YoutubeTranscript = youtubeTranscriptModule.YoutubeTranscript || youtubeTranscriptModule;
+  console.log('加载 axios...');
   axios = require('axios');
+  console.log('加载 xml2js...');
   parseString = require('xml2js').parseString;
+  console.log('加载 @xmldom/xmldom...');
   DOMParser = require('@xmldom/xmldom').DOMParser;
+  console.log('加载 ytdl-core...');
   ytdl = require('ytdl-core');
+  console.log('加载 express-session...');
   session = require('express-session');
+  console.log('加载 cookie-parser...');
   cookieParser = require('cookie-parser');
+  console.log('✅ 所有依赖加载成功！');
 } catch (error) {
-  console.error('加载依赖失败:', error.message);
+  console.error('❌ 加载依赖失败:', error.message);
   console.error('错误堆栈:', error.stack);
   console.error('当前工作目录:', process.cwd());
   console.error('__dirname:', __dirname);
+  console.error('Node 版本:', process.version);
   process.exit(1);
 }
 
@@ -1231,17 +1247,33 @@ app.delete('/api/word-groups/:groupName/words/:wordKey', requireLogin, (req, res
   }
 });
 
+// 启动前的最后检查
+console.log('=== 启动前检查 ===');
+console.log(`PORT: ${PORT}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+console.log(`工作目录: ${process.cwd()}`);
+console.log(`__dirname: ${__dirname}`);
+console.log(`PASSWORD 已设置: ${!!PASSWORD}`);
+console.log(`SESSION_SECRET 已设置: ${!!SESSION_SECRET}`);
+console.log('================');
+
 // 启动服务器
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`✅ 服务器运行在端口 ${PORT}`);
-  console.log(`📁 当前工作目录: ${process.cwd()}`);
-  console.log(`📂 __dirname: ${__dirname}`);
-  console.log(`🌐 监听地址: 0.0.0.0:${PORT}`);
-  if (process.env.NODE_ENV !== 'production') {
-    console.log(`🔗 访问地址: http://localhost:${PORT}`);
-  }
-  console.log(`🚀 服务器已启动，等待请求...`);
-});
+try {
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`✅ 服务器运行在端口 ${PORT}`);
+    console.log(`📁 当前工作目录: ${process.cwd()}`);
+    console.log(`📂 __dirname: ${__dirname}`);
+    console.log(`🌐 监听地址: 0.0.0.0:${PORT}`);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`🔗 访问地址: http://localhost:${PORT}`);
+    }
+    console.log(`🚀 服务器已启动，等待请求...`);
+  });
+} catch (error) {
+  console.error('❌ 启动服务器失败:', error);
+  console.error('错误堆栈:', error.stack);
+  process.exit(1);
+}
 
 // 错误处理
 process.on('uncaughtException', (error) => {
