@@ -200,14 +200,14 @@ if (isProduction) {
 // 配置 session
 app.use(session({
   secret: SESSION_SECRET,
-  resave: false,
+  resave: true, // 改为 true，确保每次请求都保存 session
   saveUninitialized: false,
   cookie: {
     secure: true, // 生产环境必须使用 HTTPS，设为 true
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 小时
     sameSite: 'none', // 跨域必须使用 'none'
-    domain: undefined // 不设置 domain，让浏览器自动处理跨域 cookie
+    path: '/' // 明确设置 path
   },
   name: 'connect.sid' // 明确指定 cookie 名称
 }));
@@ -327,17 +327,16 @@ app.post('/api/login', (req, res) => {
         cookieHeader: res.getHeader('Set-Cookie')
       });
       
-      // 确保响应头包含正确的 CORS 和 Cookie 设置
+      // 确保响应头包含正确的 CORS 设置
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
       
-      // 显式设置 Cookie（确保跨域 Cookie 正确设置）
-      res.cookie('connect.sid', req.sessionID, {
-        secure: true,
-        httpOnly: true,
-        maxAge: 24 * 60 * 60 * 1000,
-        sameSite: 'none',
-        path: '/'
+      // Session 中间件会自动设置 Cookie，不需要手动设置
+      // 但我们可以确保 Session 被保存
+      req.session.save((saveErr) => {
+        if (saveErr) {
+          console.error('❌ Session 二次保存失败:', saveErr);
+        }
       });
       
       res.json({ success: true, message: '登录成功' });
