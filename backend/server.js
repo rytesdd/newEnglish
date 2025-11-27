@@ -197,20 +197,22 @@ if (isProduction) {
   }
 }
 
-// 配置 session
-// 使用内存存储（默认），但在 Railway 上可能需要持久化存储
+// 配置 session - 使用文件存储，避免内存存储问题
+const sessionStore = new (require('express-session').MemoryStore)(); // 暂时还是用内存，但确保配置正确
+
 app.use(session({
   secret: SESSION_SECRET,
-  resave: true, // 每次请求都保存 session
-  saveUninitialized: true, // 改为 true，即使未初始化也保存，确保 Session ID 一致
+  store: sessionStore,
+  resave: false, // 改为 false，避免不必要的保存
+  saveUninitialized: false, // 改为 false，只有修改过的 session 才保存
+  rolling: true, // 每次请求都刷新过期时间
   cookie: {
     secure: true, // 生产环境必须使用 HTTPS，设为 true
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 小时
     sameSite: 'none', // 跨域必须使用 'none'
     path: '/', // 明确设置 path
-    // 不设置 domain，让浏览器自动处理跨域 cookie
-    domain: undefined
+    domain: undefined // 不设置 domain，让浏览器自动处理跨域 cookie
   },
   name: 'connect.sid' // 明确指定 cookie 名称
 }));
@@ -326,32 +328,46 @@ app.post('/api/login', (req, res) => {
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
     
-    // 直接设置认证状态（不使用 regenerate，避免创建新 Session）
+    // 直接设置认证状态
     req.session.isAuthenticated = true;
     
-    // 强制保存 Session
-    req.session.save((err) => {
-      if (err) {
-        console.error('❌ Session 保存失败:', err);
-        return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
-      }
-      
-      // 验证 Session 是否真的保存了
-      const sessionInfo = {
-        sessionId: req.sessionID,
-        isAuthenticated: req.session.isAuthenticated,
-        cookieHeader: res.getHeader('Set-Cookie'),
-        sessionKeys: Object.keys(req.session),
-        sessionData: JSON.stringify(req.session)
-      };
-      
-      console.log('✅ 登录成功，Session 已保存:', JSON.stringify(sessionInfo, null, 2));
-      
-      // 确保响应包含正确的 Session ID
-      res.json({ 
-        success: true, 
-        message: '登录成功',
-        sessionId: req.sessionID // 返回 Session ID 用于调试
+    // 立即保存，不使用回调，让 express-session 自动处理
+    // 但我们需要确保保存完成
+    return new Promise((resolve, reject) => {
+      req.session.save((err) => {
+        if (err) {
+          console.error('❌ Session 保存失败:', err);
+          return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
+        }
+        
+        // 验证 Session 是否真的保存了
+        const sessionInfo = {
+          sessionId: req.sessionID,
+          isAuthenticated: req.session.isAuthenticated,
+          cookieHeader: res.getHeader('Set-Cookie'),
+          sessionKeys: Object.keys(req.session),
+          sessionData: JSON.stringify(req.session)
+        };
+        
+        console.log('✅ 登录成功，Session 已保存:', JSON.stringify(sessionInfo, null, 2));
+        
+        // 验证 store 中是否有这个 session
+        sessionStore.get(req.sessionID, (storeErr, storedSession) => {
+          if (storeErr) {
+            console.error('❌ 从 store 读取 Session 失败:', storeErr);
+          } else {
+            console.log('📦 Store 中的 Session:', storedSession ? '存在' : '不存在');
+            if (storedSession) {
+              console.log('📦 Store Session keys:', Object.keys(storedSession));
+            }
+          }
+          
+          res.json({ 
+            success: true, 
+            message: '登录成功',
+            sessionId: req.sessionID
+          });
+        });
       });
     });
   } else {
