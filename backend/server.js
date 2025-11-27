@@ -168,7 +168,7 @@ app.use(cors({
       callback(null, true); // 临时允许所有 origin，生产环境建议严格限制
     }
   },
-  credentials: false // JWT 不需要 Cookie，设为 false
+  credentials: false, // JWT 不需要 Cookie，设为 false
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Cache-Control', 'Pragma', 'cache-control', 'pragma'],
   exposedHeaders: ['Set-Cookie']
