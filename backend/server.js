@@ -322,34 +322,59 @@ app.post('/api/login', (req, res) => {
   });
   
   if (password === PASSWORD) {
+    // 先设置认证状态
     req.session.isAuthenticated = true;
     
-    // 显式保存 Session
-    req.session.save((err) => {
+    // 确保响应头包含正确的 CORS 设置
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
+    
+    // 手动触发 Session 保存，确保 isAuthenticated 被保存
+    // 使用 req.session.regenerate 重新生成 Session，确保 Cookie 更新
+    req.session.regenerate((err) => {
       if (err) {
-        console.error('❌ Session 保存失败:', err);
-        return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
+        console.error('❌ Session 重新生成失败:', err);
+        // 如果重新生成失败，尝试直接保存
+        req.session.isAuthenticated = true;
+        return req.session.save((saveErr) => {
+          if (saveErr) {
+            console.error('❌ Session 保存失败:', saveErr);
+            return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
+          }
+          
+          const sessionInfo = {
+            sessionId: req.sessionID,
+            isAuthenticated: req.session.isAuthenticated,
+            cookieHeader: res.getHeader('Set-Cookie'),
+            sessionKeys: Object.keys(req.session),
+            sessionData: JSON.stringify(req.session)
+          };
+          
+          console.log('✅ 登录成功，Session 已保存:', JSON.stringify(sessionInfo, null, 2));
+          res.json({ success: true, message: '登录成功', sessionId: req.sessionID });
+        });
       }
       
-      // 确保响应头包含正确的 CORS 设置
-      res.setHeader('Access-Control-Allow-Credentials', 'true');
-      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
+      // Session 重新生成成功，设置认证状态
+      req.session.isAuthenticated = true;
       
-      // 再次保存 Session 确保持久化
+      // 保存新 Session
       req.session.save((saveErr) => {
         if (saveErr) {
-          console.error('❌ Session 二次保存失败:', saveErr);
+          console.error('❌ Session 保存失败:', saveErr);
           return res.status(500).json({ success: false, error: '登录失败，Session 保存错误' });
         }
         
-        console.log('✅ 登录成功，Session 已保存:', {
+        const sessionInfo = {
           sessionId: req.sessionID,
           isAuthenticated: req.session.isAuthenticated,
           cookieHeader: res.getHeader('Set-Cookie'),
-          sessionKeys: Object.keys(req.session)
-        });
+          sessionKeys: Object.keys(req.session),
+          sessionData: JSON.stringify(req.session)
+        };
         
-        res.json({ success: true, message: '登录成功' });
+        console.log('✅ 登录成功，Session 已重新生成并保存:', JSON.stringify(sessionInfo, null, 2));
+        res.json({ success: true, message: '登录成功', sessionId: req.sessionID });
       });
     });
   } else {
