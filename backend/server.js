@@ -209,24 +209,20 @@ app.use(session({
 
 // 登录验证中间件
 const requireLogin = (req, res, next) => {
-  // 调试日志
-  console.log('🔐 验证登录状态:', {
-    hasSession: !!req.session,
-    isAuthenticated: req.session?.isAuthenticated,
-    sessionId: req.sessionID,
-    cookies: req.cookies,
-    headers: {
-      origin: req.headers.origin,
-      cookie: req.headers.cookie
-    }
-  });
-  
-  if (req.session && req.session.isAuthenticated) {
-    next();
-  } else {
-    console.log('❌ 未通过登录验证');
-    res.status(401).json({ success: false, error: '请先登录' });
+  // 调试日志（减少日志输出，只在验证失败时输出）
+  if (!req.session || !req.session.isAuthenticated) {
+    console.log('❌ 未通过登录验证:', {
+      hasSession: !!req.session,
+      isAuthenticated: req.session?.isAuthenticated,
+      sessionId: req.sessionID,
+      cookieHeader: req.headers.cookie ? '存在' : '不存在',
+      origin: req.headers.origin
+    });
+    return res.status(401).json({ success: false, error: '请先登录' });
   }
+  
+  // 验证通过，继续处理
+  next();
 };
 
 // 确保上传目录存在（支持从根目录或 backend 目录运行）
@@ -346,9 +342,21 @@ app.get('/api/check-auth', (req, res) => {
     'Expires': '0'
   });
   
+  const isAuthenticated = !!(req.session && req.session.isAuthenticated);
+  
+  // 调试日志
+  if (!isAuthenticated) {
+    console.log('🔍 check-auth 返回未登录:', {
+      hasSession: !!req.session,
+      sessionId: req.sessionID,
+      cookieHeader: req.headers.cookie ? '存在' : '不存在',
+      origin: req.headers.origin
+    });
+  }
+  
   res.json({ 
     success: true, 
-    isAuthenticated: !!req.session.isAuthenticated 
+    isAuthenticated 
   });
 });
 
