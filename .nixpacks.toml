@@ -12,7 +12,7 @@ cmds = [
 cmds = []
 
 [start]
-cmd = "cd backend && npm start"
+cmd = "node backend/server.js"
 
 [variables]
 PATH = "/opt/venv/bin:$PATH"

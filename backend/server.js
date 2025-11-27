@@ -50,7 +50,11 @@ app.use(cookieParser());
 // 在生产环境中，如果前端构建文件存在，提供静态文件服务
 const isProduction = process.env.NODE_ENV === 'production';
 if (isProduction) {
-  const frontendBuildPath = path.join(__dirname, '../frontend/build');
+  // 支持从根目录或 backend 目录运行
+  const frontendBuildPath = fs.existsSync(path.join(__dirname, '../frontend/build'))
+    ? path.join(__dirname, '../frontend/build')
+    : path.join(__dirname, '../../frontend/build');
+  
   if (fs.existsSync(frontendBuildPath)) {
     app.use(express.static(frontendBuildPath));
     // 所有非 API 路由都返回前端应用
@@ -85,8 +89,10 @@ const requireLogin = (req, res, next) => {
   }
 };
 
-// 确保上传目录存在
-const uploadsDir = path.join(__dirname, '../uploads');
+// 确保上传目录存在（支持从根目录或 backend 目录运行）
+const uploadsDir = fs.existsSync(path.join(__dirname, '../uploads'))
+  ? path.join(__dirname, '../uploads')
+  : path.join(__dirname, '../../uploads');
 fs.ensureDirSync(uploadsDir);
 
 // 配置 multer 用于文件上传
@@ -1032,8 +1038,10 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// 背单词数据存储文件路径
-const wordGroupsFile = path.join(__dirname, '../word-groups.json');
+// 背单词数据存储文件路径（支持从根目录或 backend 目录运行）
+const wordGroupsFile = fs.existsSync(path.join(__dirname, '../word-groups.json'))
+  ? path.join(__dirname, '../word-groups.json')
+  : path.join(__dirname, '../../word-groups.json');
 
 // 确保背单词数据文件存在
 if (!fs.existsSync(wordGroupsFile)) {
