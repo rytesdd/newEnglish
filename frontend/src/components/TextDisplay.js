@@ -413,7 +413,7 @@ const TextDisplay = ({ text, filename, onWordsSaved }) => {
     } finally {
       setIsSaving(false);
     }
-  }, [selectedPhrases, filename, translations, isSaving, onWordsSaved]);
+  }, [selectedPhrases, translations, isSaving, onWordsSaved]);
 
   // 翻译处理函数
   const handleTranslate = useCallback(async () => {

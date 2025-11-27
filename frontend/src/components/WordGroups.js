@@ -5,7 +5,7 @@ import { API_ENDPOINTS } from '../config/api';
 import WordMemory from './WordMemory';
 import './WordGroups.css';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 const { Panel } = Collapse;
 
 const WordGroups = ({ refreshTrigger }) => {

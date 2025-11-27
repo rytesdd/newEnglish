@@ -12,12 +12,6 @@ const FileUploader = ({ onFileParsed, onError, onLoading }) => {
     if (!file) return;
 
     // 验证文件类型
-    const allowedTypes = [
-      'text/plain',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-    ];
     const allowedExtensions = ['.txt', '.pdf', '.doc', '.docx'];
     const fileExt = '.' + file.name.split('.').pop().toLowerCase();
 

@@ -5,7 +5,6 @@ import { API_ENDPOINTS } from '../config/api';
 import './YouTubeInput.css';
 
 const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
-  const [url, setUrl] = useState('');
   const [form] = Form.useForm();
   const API_URL = API_ENDPOINTS.YOUTUBE_TRANSCRIPT;
   const submitTimeoutRef = useRef(null);
@@ -53,8 +52,7 @@ const YouTubeInput = ({ onTranscriptParsed, onError, onLoading }) => {
 
   const handleInputChange = (e) => {
     const newUrl = e.target.value;
-    // 更新状态（Form.Item 会自动管理，这里更新本地状态用于自动提交判断）
-    setUrl(newUrl);
+    // Form.Item 会自动管理状态
     
     // 清除之前的定时器
     if (submitTimeoutRef.current) {

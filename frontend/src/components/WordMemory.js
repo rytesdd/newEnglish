@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Button, Card, Space, Typography, message } from 'antd';
+import { Button, Card, Space, Typography } from 'antd';
 import './WordMemory.css';
 
-const { Title, Text } = Typography;
+const { Text } = Typography;
 
 const WordMemory = ({ group, onExit }) => {
-  const [words, setWords] = useState(group.words || []);
+  const [words] = useState(group.words || []);
   const [currentWordIndex, setCurrentWordIndex] = useState(0); // 当前正在背的新单词索引
   const [reviewQueue, setReviewQueue] = useState([]); // 当前需要复习的单词队列
   const [rememberedWords, setRememberedWords] = useState(new Set()); // 已记住的单词索引
@@ -32,6 +32,7 @@ const WordMemory = ({ group, onExit }) => {
 
   // 构建复习队列：包含从0到endIndex-1的所有单词
   // 规则：在背下一个新单词之前，需要复习所有之前背过的单词（不管是否记住）
+  // eslint-disable-next-line no-unused-vars
   const buildReviewQueue = (endIndex) => {
     const queue = [];
     for (let i = 0; i < endIndex; i++) {
@@ -218,9 +219,10 @@ const WordMemory = ({ group, onExit }) => {
   };
 
   // 重置翻译显示状态
+  const reviewQueueKey = reviewQueue.join(',');
   useEffect(() => {
     setShowTranslation(false);
-  }, [state, currentWordIndex, reviewQueue.join(',')]);
+  }, [state, currentWordIndex, reviewQueueKey]);
 
   const currentWord = getCurrentWord();
   const isAllRemembered = currentWordIndex >= words.length && reviewQueue.length === 0 && state === 'LEARN' && rememberedWords.size === words.length;
