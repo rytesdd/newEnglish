@@ -323,12 +323,22 @@ app.post('/api/login', (req, res) => {
       
       console.log('✅ 登录成功，Session 已保存:', {
         sessionId: req.sessionID,
-        isAuthenticated: req.session.isAuthenticated
+        isAuthenticated: req.session.isAuthenticated,
+        cookieHeader: res.getHeader('Set-Cookie')
       });
       
       // 确保响应头包含正确的 CORS 和 Cookie 设置
       res.setHeader('Access-Control-Allow-Credentials', 'true');
       res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
+      
+      // 显式设置 Cookie（确保跨域 Cookie 正确设置）
+      res.cookie('connect.sid', req.sessionID, {
+        secure: true,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'none',
+        path: '/'
+      });
       
       res.json({ success: true, message: '登录成功' });
     });
