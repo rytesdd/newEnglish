@@ -155,6 +155,7 @@ const allowedOrigins = process.env.ALLOWED_ORIGINS
   : ['http://localhost:3000'];
 
 // 中间件
+// 注意：CORS 必须在 cookieParser 之前配置
 app.use(cors({
   origin: function (origin, callback) {
     // 允许没有 origin 的请求（如移动应用或 Postman）
@@ -167,7 +168,10 @@ app.use(cors({
       callback(null, true); // 临时允许所有 origin，生产环境建议严格限制
     }
   },
-  credentials: true // 允许跨域携带 cookie
+  credentials: true, // 允许跨域携带 cookie
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Set-Cookie']
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -321,6 +325,10 @@ app.post('/api/login', (req, res) => {
         sessionId: req.sessionID,
         isAuthenticated: req.session.isAuthenticated
       });
+      
+      // 确保响应头包含正确的 CORS 和 Cookie 设置
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+      res.setHeader('Access-Control-Allow-Origin', req.headers.origin || allowedOrigins[0]);
       
       res.json({ success: true, message: '登录成功' });
     });
