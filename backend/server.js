@@ -217,12 +217,18 @@ const requireLogin = (req, res, next) => {
       isAuthenticated: req.session?.isAuthenticated,
       sessionId: req.sessionID,
       cookieHeader: req.headers.cookie ? '存在' : '不存在',
-      origin: req.headers.origin
+      cookieValue: req.headers.cookie,
+      origin: req.headers.origin,
+      url: req.url
     });
     return res.status(401).json({ success: false, error: '请先登录' });
   }
   
   // 验证通过，继续处理
+  console.log('✅ 登录验证通过:', {
+    sessionId: req.sessionID,
+    url: req.url
+  });
   next();
 };
 
