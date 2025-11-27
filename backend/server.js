@@ -1,6 +1,6 @@
 // 加载环境变量（支持从根目录或 backend 目录运行）
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const dotenvPath = fs.existsSync(path.join(__dirname, '../.env'))
   ? path.join(__dirname, '../.env')
   : path.join(__dirname, '../../.env');
@@ -9,7 +9,6 @@ require('dotenv').config({ path: dotenvPath });
 const express = require('express');
 const cors = require('cors');
 const multer = require('multer');
-const fs = require('fs-extra');
 const { execSync } = require('child_process');
 const pdfParse = require('pdf-parse');
 const mammoth = require('mammoth');
